@@ -1,6 +1,7 @@
 package com.me.njerucyrus.jobsapp2;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.renderscript.Script;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
@@ -16,6 +17,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
@@ -28,6 +31,7 @@ public class PostJobActivity extends AppCompatActivity {
     EditText txtTitle, txtDescription, txtSalary, txtDeadline, txtLocation;
     String category;
     FirebaseFirestore db;
+    FirebaseAuth mAuth;
     ProgressDialog progressDialog;
 
     @Override
@@ -152,5 +156,15 @@ public class PostJobActivity extends AppCompatActivity {
             txtDeadline.setError(null);
         }
         return valid;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        }
     }
 }

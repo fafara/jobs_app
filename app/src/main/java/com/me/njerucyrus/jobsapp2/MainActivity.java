@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity
     List<JobPost> jobPosts = new ArrayList<>();
     ProgressDialog progressDialog;
     FirebaseFirestore db;
+    FirebaseAuth mAuth;
 
     final String TAG = "MainActivityTag";
 
@@ -185,5 +186,15 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        }
     }
 }
