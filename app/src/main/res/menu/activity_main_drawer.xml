@@ -5,33 +5,38 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:id="@+id/nav_post_job"
+            android:icon="@drawable/ic_add_black_48dp"
+            android:title="Post Job" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_all_job_posts"
+            android:icon="@drawable/ic_remove_red_eye_black_48dp"
+            android:title="All Job Posts" />
+        <item
+            android:id="@+id/nav_my_posts"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="My Posts" />
     </group>
 
     <item android:title="Communicate">
         <menu>
             <item
-                android:id="@+id/nav_share"
+                android:id="@+id/nav_invite_friend"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:title="Invite Friend" />
+        </menu>
+    </item>
+
+    <item android:title="Account">
+        <menu>
             <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:id="@+id/nav_profile"
+                android:icon="@drawable/ic_person_black_48dp"
+                android:title="Profile" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_power_settings_new_black_48dp"
+                android:title="Logout" />
         </menu>
     </item>
 

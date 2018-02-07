@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.me.njerucyrus.jobsapp2.PostJobStep1Activity">
+    tools:context="com.me.njerucyrus.jobsapp2.PostJobActivity">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -15,8 +15,8 @@
         >
 
         <Spinner
-            android:layout_marginTop="10dp"
             android:id="@+id/category_spinner"
+            android:layout_marginTop="10dp"
             android:layout_width="fill_parent"
             android:layout_height="42dp"
             android:background="@xml/round_edit_text"
@@ -26,6 +26,32 @@
             >
 
         </Spinner>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:drawablePadding="5dp"
+
+            android:background="@xml/round_edit_text"
+            >
+
+            <EditText
+                android:id="@+id/txtTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/post_job_title_hint"
+                android:drawableStart="@drawable/ic_title_black_32dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="10dp"
+                android:inputType="textMultiLine"
+                android:background="@null"
+                />
+        </android.support.design.widget.TextInputLayout>
+
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,7 +89,7 @@
             >
 
             <EditText
-                android:id="@+id/txtPrice"
+                android:id="@+id/txtSalary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/post_job_price_hint"
@@ -128,6 +154,7 @@
         </android.support.design.widget.TextInputLayout>
 
         <Button
+            android:id="@+id/btnSubmitJobPost"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/colorWhite"

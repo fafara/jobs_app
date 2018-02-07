@@ -3,38 +3,36 @@ package com.me.njerucyrus.jobsapp2;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkError;
-import com.android.volley.NoConnectionError;
-import com.android.volley.ParseError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.ServerError;
-import com.android.volley.TimeoutError;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.me.njerucyrus.models.JobPost;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,12 +40,14 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    RequestQueue requestQueue;
     RecyclerView recyclerView;
     MyAdapter adapter;
-    List<JobPost> listItems =new ArrayList<>();
+    List<JobPost> jobPosts = new ArrayList<>();
     ProgressDialog progressDialog;
-    private String URL;
+    FirebaseFirestore db;
+
+    final String TAG = "MainActivityTag";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,83 +81,43 @@ public class MainActivity extends AppCompatActivity
 
         progressDialog = new ProgressDialog(this);
 
-        requestQueue = VolleyRequestSingleton.getInstance(this.getApplicationContext()).getRequestQueue();
-
         progressDialog.setMessage("Loading...");
         progressDialog.show();
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, URL, null,
-                new Response.Listener<JSONObject>() {
+        db = FirebaseFirestore.getInstance();
+        db.collection("jobs").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
-                    public void onResponse(JSONObject response) {
-
-                        try {
-                            if (response.getInt("status_code") == 200) {
-                                JSONArray data = response.optJSONArray("data");
-                                for (int i = 0; i < data.length(); i++) {
-                                    JSONObject object = data.optJSONObject(i);
-
-                                    JobPost post = new JobPost();
-                                    post.setTitle(object.getString("title"));
-                                    post.setDescription(object.getString("description"));
-                                    post.setPostedOn(object.getString("posted_on"));
-                                    post.setDeadline(object.getString("deadline"));
-                                    //add only items which are not archived
-                                    listItems.add(post);
-                                }
-                                adapter = new MyAdapter(listItems, getApplicationContext());
-                                adapter.notifyDataSetChanged();
-                                recyclerView.setAdapter(adapter);
-
-
-                            } else {
-                                Toast.makeText(getApplicationContext(), "No data found", Toast.LENGTH_LONG).show();
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (progressDialog.isShowing()) {
+                                progressDialog.dismiss();
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            for (DocumentSnapshot document : task.getResult()) {
+                                JobPost jobPost = new JobPost();
+                                jobPost.setTitle(document.getString("title"));
+                                jobPost.setCategory(document.getString("category"));
+                                jobPost.setDescription(document.getString("description"));
+                                jobPost.setPostedOn(document.getString("posted_on"));
+                                jobPost.setDeadline(document.getString("deadline"));
+                                jobPost.setLocation(document.getString("location"));
+                                jobPosts.add(jobPost);
+                            }
+
+                            adapter = new MyAdapter(jobPosts, MainActivity.this);
+                            recyclerView.setAdapter(adapter);
+
+                        } else {
+                            if (progressDialog.isShowing()) {
+                                progressDialog.dismiss();
+                            }
+                            Toast.makeText(MainActivity.this, "No data found", Toast.LENGTH_LONG).show();
                         }
-
-
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                        String message = null;
-                        if (error instanceof NetworkError) {
-                            message = "Cannot connect to Internet...Please check your connection!";
-                        } else if (error instanceof ServerError) {
-                            message = "The server could not be found. Please try again after some time!!";
-                        } else if (error instanceof AuthFailureError) {
-                            message = "Cannot connect to Internet...Please check your connection!";
-                        } else if (error instanceof ParseError) {
-                            message = "Parsing error! Please try again after some time!!";
-                        } else if (error instanceof NoConnectionError) {
-                            message = "Cannot connect to Internet...Please check your connection!";
-                        } else if (error instanceof TimeoutError) {
-                            message = "Connection TimeOut! Please check your internet connection.";
-                        }
-                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-
-
-                    }
-                }
-        );
-
-        requestQueue.add(jsonObjectRequest);
-
-        requestQueue.addRequestFinishedListener(new RequestQueue.RequestFinishedListener<Object>() {
-            @Override
-            public void onRequestFinished(Request<Object> request) {
-                if(progressDialog.isShowing()){
-                    progressDialog.dismiss();
-                }
-            }
-        });
-
+                });
 
 
     }
+
 
     @Override
     public void onBackPressed() {
@@ -197,23 +157,31 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-        } else if (id == R.id.nav_gallery) {
-            startActivity(new Intent(getApplicationContext(), RegisterActivity.class));
+        if (id == R.id.nav_post_job) {
+            startActivity(new Intent(MainActivity.this, PostJobActivity.class));
 
-        } else if (id == R.id.nav_slideshow) {
-            startActivity(new Intent(getApplicationContext(), PostJobStep1Activity.class));
+        } else if (id == R.id.nav_all_job_posts) {
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_my_posts) {
+            Toast.makeText(getApplicationContext(), "Comming soon", Toast.LENGTH_LONG).show();
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_invite_friend) {
+            Toast.makeText(getApplicationContext(), "Comming soon", Toast.LENGTH_LONG).show();
+        } else if (id == R.id.nav_profile) {
+            Toast.makeText(getApplicationContext(), "Comming soon", Toast.LENGTH_LONG).show();
 
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_logout) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+            } else {
+                //LOGIN
+
+            }
 
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

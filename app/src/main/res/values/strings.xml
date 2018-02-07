@@ -13,6 +13,7 @@
     <string name="register_phonenumber_hint">Enter Your Phone Number</string>
     <string name="register_email_hint">Enter Your Email Address</string>
     <string name="register_confirm_pass_hint">Confirm password</string>
+    <string name="post_job_title_hint">Title</string>
     <string name="post_job_desc_hint">Description</string>
     <string name="post_job_price_hint">Salary</string>
     <string name="post_job_deadline_hint">Deadline</string>
