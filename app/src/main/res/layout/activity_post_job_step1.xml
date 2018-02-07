@@ -128,16 +128,16 @@
         </android.support.design.widget.TextInputLayout>
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/colorWhite"
-            android:drawableEnd="@drawable/ic_arrow_forward_black_24dp"
             android:background="@xml/round_button"
             android:text="@string/post_job_button_next"
             android:layout_marginTop="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
             android:layout_gravity="center"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
+            android:padding="15dp"
             android:paddingBottom="10dp"
             android:drawablePadding="10dp"
             />

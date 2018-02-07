@@ -17,7 +17,9 @@
     <string name="post_job_price_hint">Salary</string>
     <string name="post_job_deadline_hint">Deadline</string>
     <string name="post_job_location_hint">Location</string>
-    <string name="post_job_button_next">Next</string>
+    <string name="post_job_button_next">Submit</string>
+    <string name="post_job_image_logo">Logged in user pic</string>
+    <string name="vertical_ellipsis">&#8942;</string>
 
     <string-array name="caterory_array">
         <item>Category 1</item>
