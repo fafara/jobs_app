@@ -12,10 +12,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 public class LoginActivity extends AppCompatActivity {
     Button btnAuthLogin, btnAuthCreateAccount;
@@ -36,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(LoginActivity.this);
         progressDialog.setMessage("Authenticating...");
         btnAuthCreateAccount = (Button) findViewById(R.id.btnAuthCreateAccount);
+        mAuth = FirebaseAuth.getInstance();
 
         btnAuthCreateAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,13 +75,30 @@ public class LoginActivity extends AppCompatActivity {
                                         }
                                         // If sign in fails, display a message to the user.
                                         Log.w(TAG, "signInWithEmail:failure", task.getException());
-                                        Toast.makeText(LoginActivity.this, "Invalid email or password.",
+                                        Toast.makeText(LoginActivity.this, "Authentication failed.",
                                                 Toast.LENGTH_LONG).show();
                                     }
 
 
                                 }
-                            });
+                            }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            if (e instanceof FirebaseNetworkException){
+                                if (progressDialog.isShowing()){
+                                    progressDialog.dismiss();
+                                }
+                                Toast.makeText(LoginActivity.this, "No internet connection", Toast.LENGTH_LONG).show();
+                            }
+                            if (e instanceof FirebaseFirestoreException){
+                                if (progressDialog.isShowing()){
+                                    progressDialog.dismiss();
+                                }
+                                Toast.makeText(LoginActivity.this, "Internal server error occurred", Toast.LENGTH_LONG).show();
+                            }
+
+                        }
+                    });
 
                 } else {
                     Toast.makeText(getApplicationContext(), "Please fix the errors above",

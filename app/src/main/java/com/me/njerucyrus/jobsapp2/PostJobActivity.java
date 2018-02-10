@@ -2,11 +2,10 @@ package com.me.njerucyrus.jobsapp2;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.renderscript.Script;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,16 +14,19 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.me.njerucyrus.models.JobPost;
 
 import java.util.Date;
-import java.util.HashMap;
 
 public class PostJobActivity extends AppCompatActivity {
     Button btnSubmitJobPost;
@@ -33,6 +35,8 @@ public class PostJobActivity extends AppCompatActivity {
     FirebaseFirestore db;
     FirebaseAuth mAuth;
     ProgressDialog progressDialog;
+    private JobPost jobPost;
+    Spinner spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +45,7 @@ public class PostJobActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
-        Spinner spinner = (Spinner) findViewById(R.id.category_spinner);
+        spinner = (Spinner) findViewById(R.id.category_spinner);
 // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.caterory_array, android.R.layout.simple_spinner_item);
@@ -67,7 +71,8 @@ public class PostJobActivity extends AppCompatActivity {
         });
         txtTitle = (EditText) findViewById(R.id.txtTitle);
         txtDescription = (EditText) findViewById(R.id.txtDescription);
-        txtSalary = (EditText) findViewById(R.id.txtSalary);
+
+        txtLocation = (EditText) findViewById(R.id.txtLocation);
         txtDeadline = (EditText) findViewById(R.id.txtDeadline);
 
         progressDialog = new ProgressDialog(this);
@@ -85,26 +90,46 @@ public class PostJobActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (validate()) {
-                    HashMap<String, Object> data = new HashMap<>();
-                    data.put("category", category);
-                    data.put("title", txtTitle.getText().toString());
-                    data.put("description", txtDescription.getText().toString());
-                    data.put("deadline", txtDeadline.getText().toString());
-                    data.put("lat", 0.0);
-                    data.put("lng", 0.0);
-                    data.put("posted_by", "default user");
-                    data.put("posted_on", new Date().toString());
+
+                    double lat = 0.00;
+                    double lng = 0.00;
+                    Date postedOn = new Date();
+                    FirebaseUser currentUser = mAuth.getCurrentUser();
+                    String user = currentUser.getEmail();
+
+                    jobPost = new JobPost(
+                            category,
+                            txtDescription.getText().toString().trim(),
+                            txtTitle.getText().toString().trim(),
+                            txtLocation.getText().toString().trim(),
+                            lat,
+                            lng,
+                            postedOn,
+                            user,
+                            txtDeadline.getText().toString()
+                    );
+
 
                     progressDialog.show();
-                    db.collection("jobs").add(data)
+                    db.collection("jobs").add(jobPost)
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
                                     if (progressDialog.isShowing()) {
                                         progressDialog.dismiss();
                                     }
-                                    Toast.makeText(getApplicationContext(), "Added Document " + documentReference.getId(),
+                                    Toast.makeText(getApplicationContext(), "Job Post submitted",
                                             Toast.LENGTH_LONG).show();
+                                    startActivity(new Intent(PostJobActivity.this, MainActivity.class));
+                                }
+                            })
+                            .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentReference> task) {
+                                    if (progressDialog.isShowing()) {
+                                        progressDialog.dismiss();
+                                    }
+
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
@@ -118,41 +143,44 @@ public class PostJobActivity extends AppCompatActivity {
                                             Toast.LENGTH_LONG).show();
                                 }
                             });
-
-                }else{
-                    Toast.makeText(getApplicationContext(), "Please fix the errors above",
-                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
-    public boolean validate(){
+    public boolean validate() {
         boolean valid = true;
-        if (txtTitle.getText().toString().trim().isEmpty()){
+        if (txtTitle.getText().toString().trim().isEmpty()) {
             txtTitle.setError("This field is required");
             valid = false;
-        }else{
+        } else {
             txtTitle.setError(null);
         }
 
-        if (txtDescription.getText().toString().trim().isEmpty()){
+        if (txtDescription.getText().toString().trim().isEmpty()) {
             txtDescription.setError("This field is required");
             valid = false;
-        }else{
+        } else {
             txtDescription.setError(null);
         }
 
-        if (txtSalary.getText().toString().trim().isEmpty()){
-            txtSalary.setError("This field is required");
+        if (spinner.getSelectedItem().equals("Select Category")) {
             valid = false;
-        }else{
-            txtSalary.setError(null);
+            Toast.makeText(getApplicationContext(), "Select Category",
+                    Toast.LENGTH_SHORT).show();
         }
-        if(txtDeadline.getText().toString().trim().isEmpty()){
+
+        if (txtLocation.getText().toString().trim().isEmpty()) {
+            txtLocation.setError("This field is required");
+            valid = false;
+        } else {
+            txtLocation.setError(null);
+        }
+
+        if (txtDeadline.getText().toString().trim().isEmpty()) {
             txtDeadline.setError("This field is required");
             valid = false;
-        }else{
+        } else {
             txtDeadline.setError(null);
         }
         return valid;

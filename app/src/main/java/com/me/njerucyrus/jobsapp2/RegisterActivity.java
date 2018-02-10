@@ -18,6 +18,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.me.njerucyrus.models.User;
 
 import java.util.HashMap;
 
@@ -30,7 +31,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     FirebaseFirestore db;
     private FirebaseAuth mAuth;
-    private HashMap<String, Object> user;
+    private User user;
 
     ProgressDialog progressDialog;
 
@@ -60,10 +61,8 @@ public class RegisterActivity extends AppCompatActivity {
                     String email = txtEmail.getText().toString();
                     String phoneNumber = txtPhoneNumber.getText().toString();
                     String password = txtConfirmPassword.getText().toString();
-                    user = new HashMap<>();
-                    user.put("fullname", fullName);
-                    user.put("email", email);
-                    user.put("phone_number", phoneNumber);
+                    user = new User(fullName, email,phoneNumber);
+
 
                     progressDialog.setMessage("Creating account ...");
                     progressDialog.show();

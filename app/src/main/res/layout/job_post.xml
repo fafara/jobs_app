@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,13 +13,14 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/activity_horizontal_margin"
+            android:layout_margin="5dp"
             >
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/txtTitle"
                 android:text="Title"
+                android:textColor="@color/colorGreen"
                 android:textAppearance="?android:textAppearanceMedium"
                 />
             <LinearLayout
@@ -29,13 +30,6 @@
                 android:orientation="horizontal"
                 android:layout_below="@id/txtTitle"
                 >
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_person_black_48dp"
-                    android:padding="5dp"
-                    android:contentDescription="@string/post_job_image_logo"
-                    />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -43,9 +37,6 @@
                     android:id="@+id/txtItemDescription"
                     android:text="Description"
                     android:textAppearance="?android:textAppearanceSmall"
-                    android:drawablePadding="5dp"
-                    android:paddingStart="5dp"
-                    android:paddingEnd="5dp"
                     />
 
             </LinearLayout>
@@ -55,36 +46,22 @@
                 android:padding="@dimen/activity_horizontal_margin"
                 android:layout_below="@id/contentLayout"
                 >
-                <TextView
-                    android:id="@+id/txtDeadline"
+                <com.github.curioustechizen.ago.RelativeTimeTextView
+                    android:id="@+id/timestamp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Deadline"
-                    android:textAppearance="?android:textAppearanceSmall"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginLeft="48dp"
-                    />
-                <TextView
-                    android:id="@+id/txtDatePosted"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Posted on"
-                    android:textAppearance="?android:textAppearanceSmall"
+                    app:relative_time_prefix=""
                     android:layout_alignParentEnd="true"
-                    />
+                     />
             </RelativeLayout>
 
             <TextView
                 android:layout_width="48dp"
-                android:layout_height="80dp"
+                android:layout_height="48dp"
                 android:id="@+id/txtOptionDigit"
-                android:text="@string/vertical_ellipsis"
-                android:textColor="@color/colorBlack"
-                android:textAppearance="?android:textAppearanceLarge"
+                android:drawableEnd="@drawable/ic_more_vert_black_24dp"
                 android:gravity="end"
                 android:layout_alignParentRight="true"
-                android:textStyle="bold"
-                android:textSize="30sp"
 
                 />
 

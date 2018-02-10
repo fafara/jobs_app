@@ -23,7 +23,9 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
@@ -31,6 +33,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.me.njerucyrus.models.JobPost;
 
@@ -40,12 +44,13 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    RecyclerView recyclerView;
-    MyAdapter adapter;
-    List<JobPost> jobPosts = new ArrayList<>();
-    ProgressDialog progressDialog;
-    FirebaseFirestore db;
-    FirebaseAuth mAuth;
+    private RecyclerView recyclerView;
+    private MyAdapter adapter;
+    private List<JobPost> jobPosts;
+    private ProgressDialog progressDialog;
+    private FirebaseFirestore db;
+    private ListenerRegistration firestoreListener;
+    private FirebaseAuth mAuth;
 
     final String TAG = "MainActivityTag";
 
@@ -80,42 +85,39 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        jobPosts = new ArrayList<>();
+
         progressDialog = new ProgressDialog(this);
 
         progressDialog.setMessage("Loading...");
         progressDialog.show();
         db = FirebaseFirestore.getInstance();
-        db.collection("jobs").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        loadJobPosts();
+
+        firestoreListener = db.collection("jobs")
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            if (progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                            }
-                            for (DocumentSnapshot document : task.getResult()) {
-                                JobPost jobPost = new JobPost();
-                                jobPost.setTitle(document.getString("title"));
-                                jobPost.setCategory(document.getString("category"));
-                                jobPost.setDescription(document.getString("description"));
-                                jobPost.setPostedOn(document.getString("posted_on"));
-                                jobPost.setDeadline(document.getString("deadline"));
-                                jobPost.setLocation(document.getString("location"));
-                                jobPosts.add(jobPost);
-                            }
+                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                        if (e != null) {
 
-                            adapter = new MyAdapter(jobPosts, MainActivity.this);
-                            recyclerView.setAdapter(adapter);
-
-                        } else {
-                            if (progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                            }
-                            Toast.makeText(MainActivity.this, "No data found", Toast.LENGTH_LONG).show();
+                            Log.e(TAG, "Listen failed!", e);
+                            return;
                         }
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
+                        List<JobPost> updatedList = new ArrayList<>();
+                        for (DocumentSnapshot doc : documentSnapshots) {
+
+                            JobPost post = doc.toObject(JobPost.class);
+                            updatedList.add(post);
+                        }
+                        jobPosts.clear();
+                        adapter = new MyAdapter(updatedList, MainActivity.this, db);
+                        recyclerView.setAdapter(adapter);
+
                     }
                 });
-
 
     }
 
@@ -165,8 +167,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
         } else if (id == R.id.nav_my_posts) {
-            Toast.makeText(getApplicationContext(), "Comming soon", Toast.LENGTH_LONG).show();
-
+           startActivity(new Intent(MainActivity.this, MyPostsActivity.class));
         } else if (id == R.id.nav_invite_friend) {
             Toast.makeText(getApplicationContext(), "Comming soon", Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_profile) {
@@ -189,6 +190,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        firestoreListener.remove();
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         mAuth = FirebaseAuth.getInstance();
@@ -196,5 +203,36 @@ public class MainActivity extends AppCompatActivity
         if (currentUser == null) {
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         }
+    }
+
+    private void loadJobPosts() {
+        db.collection("jobs").orderBy("postedOn", Query.Direction.DESCENDING)
+                .limit(50)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (progressDialog.isShowing()) {
+                            progressDialog.dismiss();
+                        }
+
+                        if (task.isSuccessful()) {
+
+                            for (DocumentSnapshot document : task.getResult()) {
+                                JobPost jobPost = document.toObject(JobPost.class);
+                                jobPosts.add(jobPost);
+                            }
+
+                            adapter = new MyAdapter(jobPosts, MainActivity.this, db);
+                            recyclerView.setAdapter(adapter);
+
+                        } else {
+                            if (progressDialog.isShowing()) {
+                                progressDialog.dismiss();
+                            }
+                            Toast.makeText(MainActivity.this, "No data found", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
     }
 }

@@ -16,17 +16,22 @@
     <string name="post_job_title_hint">Title</string>
     <string name="post_job_desc_hint">Description</string>
     <string name="post_job_price_hint">Salary</string>
-    <string name="post_job_deadline_hint">Deadline</string>
+    <string name="post_job_deadline_hint">Deadline eg 24hrs</string>
     <string name="post_job_location_hint">Location</string>
     <string name="post_job_button_next">Submit</string>
     <string name="post_job_image_logo">Logged in user pic</string>
     <string name="vertical_ellipsis">&#8942;</string>
 
     <string-array name="caterory_array">
-        <item>Category 1</item>
-        <item>Category 2</item>
-        <item>Category 3</item>
-        <item>Category 4</item>
-        <item>Category 5</item>
+        <item>Select Category</item>
+        <item>Wash,Clean and Stitch</item>
+        <item>Install,Repair and Decorate</item>
+        <item>Transport and Delivery</item>
+        <item>House chores</item>
+        <item>Academic</item>
+        <item>Queuing</item>
+        <item>Mobile and Computer Services</item>
+        <item>For the Young Ones</item>
+        <item>General (Storage)</item>
     </string-array>
 </resources>

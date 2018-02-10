@@ -1,36 +1,22 @@
 package com.me.njerucyrus.jobsapp2;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkError;
-import com.android.volley.NoConnectionError;
-import com.android.volley.ParseError;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.ServerError;
-import com.android.volley.TimeoutError;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.github.curioustechizen.ago.RelativeTimeTextView;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.me.njerucyrus.models.JobPost;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,10 +26,12 @@ import java.util.List;
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private List<JobPost> listItems;
     private Context mContext;
+    private FirebaseFirestore db;
 
-    public MyAdapter(List<JobPost> listItems, Context mContext) {
+    public MyAdapter(List<JobPost> listItems, Context mContext, FirebaseFirestore db) {
         this.listItems = listItems;
         this.mContext = mContext;
+        this.db = db;
     }
 
     @Override
@@ -56,11 +44,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     public void onBindViewHolder(final ViewHolder holder, int position) {
         final JobPost itemList = listItems.get(position);
 
-
-        holder.txtTitle.setText(itemList.getTitle());
-        holder.txtItemDescription.setText(itemList.getDescription());
-        holder.txtDatePosted.setText(itemList.getPostedOn());
-        holder.txtDeadline.setText(itemList.getDeadline());
+        String desc = itemList.getDescription()+"\nCategory: "+itemList.getCategory()+"\nDeadline "+itemList.getDeadline()+
+                "\nposted by "+itemList.getPostedBy();
+        holder.txtTitle.setText(itemList.getTitle()+" @"+itemList.getLocation());
+        holder.txtItemDescription.setText(desc);
+        holder.timePosted.setReferenceTime(itemList.getPostedOn().getTime());
 
 
     }
@@ -74,8 +62,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         public TextView txtTitle;
         public TextView txtItemDescription;
         public TextView txtOptionDigit;
-        public TextView txtDatePosted;
-        public TextView txtDeadline;
+        public RelativeTimeTextView timePosted;
 
         ProgressDialog progressDialog;
         RequestQueue requestQueue;
@@ -85,10 +72,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             txtTitle = (TextView) itemView.findViewById(R.id.txtTitle);
             txtItemDescription = (TextView) itemView.findViewById(R.id.txtItemDescription);
             txtOptionDigit = (TextView) itemView.findViewById(R.id.txtOptionDigit);
-            txtDatePosted = (TextView)itemView.findViewById(R.id.txtDatePosted);
-            txtDeadline = (TextView)itemView.findViewById(R.id.txtDeadline);
-
-
+            timePosted = (RelativeTimeTextView) itemView.findViewById(R.id.timestamp);
 
         }
 

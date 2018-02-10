@@ -1,5 +1,9 @@
 package com.me.njerucyrus.models;
 
+import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Date;
+
 /**
  * Created by njerucyrus on 2/6/18.
  */
@@ -9,31 +13,25 @@ public class JobPost {
     private String description;
     private String title;
     private String location;
-    private Float lat;
-    private Float lng;
-    private Float salary;
-    private String postedOn;
-    private String deadline;
+    private double lat;
+    private double lng;
+    private Date postedOn;
     private String postedBy;
+    private String deadline;
 
-    public JobPost(){}
+    public JobPost() {
+    }
 
-    public JobPost(String category, String description,
-                   String title, String location,
-                   Float lat, Float lng,
-                   Float salary, String postedOn,
-                   String deadline,
-                   String postedBy) {
+    public JobPost(String category, String description, String title, String location, double lat, double lng, Date postedOn, String postedBy, String deadline) {
         this.category = category;
         this.description = description;
         this.title = title;
         this.location = location;
         this.lat = lat;
         this.lng = lng;
-        this.salary = salary;
         this.postedOn = postedOn;
-        this.deadline = deadline;
         this.postedBy = postedBy;
+        this.deadline = deadline;
     }
 
     public String getCategory() {
@@ -68,44 +66,28 @@ public class JobPost {
         this.location = location;
     }
 
-    public Float getLat() {
+    public double getLat() {
         return lat;
     }
 
-    public void setLat(Float lat) {
+    public void setLat(double lat) {
         this.lat = lat;
     }
 
-    public Float getLng() {
+    public double getLng() {
         return lng;
     }
 
-    public void setLng(Float lng) {
+    public void setLng(double lng) {
         this.lng = lng;
     }
 
-    public Float getSalary() {
-        return salary;
-    }
-
-    public void setSalary(Float salary) {
-        this.salary = salary;
-    }
-
-    public String getPostedOn() {
+    public Date getPostedOn() {
         return postedOn;
     }
 
-    public void setPostedOn(String postedOn) {
+    public void setPostedOn(Date postedOn) {
         this.postedOn = postedOn;
-    }
-
-    public String getDeadline() {
-        return deadline;
-    }
-
-    public void setDeadline(String deadline) {
-        this.deadline = deadline;
     }
 
     public String getPostedBy() {
@@ -114,5 +96,13 @@ public class JobPost {
 
     public void setPostedBy(String postedBy) {
         this.postedBy = postedBy;
+    }
+
+    public String getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(String deadline) {
+        this.deadline = deadline;
     }
 }
