@@ -2,8 +2,8 @@ package com.me.njerucyrus.jobsapp2;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +14,6 @@ import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.me.njerucyrus.models.JobPost;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -51,30 +49,51 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         holder.timePosted.setReferenceTime(itemList.getPostedOn().getTime());
 
 
+
     }
+
 
     @Override
     public int getItemCount() {
         return listItems.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public  class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView txtTitle;
         public TextView txtItemDescription;
         public TextView txtOptionDigit;
         public RelativeTimeTextView timePosted;
 
-        ProgressDialog progressDialog;
-        RequestQueue requestQueue;
+
+
 
         public ViewHolder(final View itemView) {
             super(itemView);
+
+            itemView.setOnClickListener(this);
+
+
             txtTitle = (TextView) itemView.findViewById(R.id.txtTitle);
             txtItemDescription = (TextView) itemView.findViewById(R.id.txtItemDescription);
             txtOptionDigit = (TextView) itemView.findViewById(R.id.txtOptionDigit);
             timePosted = (RelativeTimeTextView) itemView.findViewById(R.id.timestamp);
 
+
         }
 
+        @Override
+        public void onClick(View view) {
+            JobPost post  = listItems.get(getAdapterPosition());
+            Intent intent = new Intent(mContext, JobPostDetailActivity.class);
+
+            intent.putExtra("category", post.getCategory());
+            intent.putExtra("description", post.getDescription());
+            intent.putExtra("title", post.getTitle());
+            intent.putExtra("location", post.getLocation());
+            intent.putExtra("postedOn", post.getPostedOn());
+            intent.putExtra("postedBy", post.getPostedBy());
+            intent.putExtra("deadline", post.getDeadline());
+            mContext.startActivity(intent);
+        }
     }
 }

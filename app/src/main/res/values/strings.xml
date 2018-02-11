@@ -1,5 +1,11 @@
 <resources>
-    <string name="app_name">JobsApp</string>
+    <string name="app_name">Jobs App</string>
+    <string name="login_activity_label">Login</string>
+    <string name="register_activity_label">Register</string>
+    <string name="myposts_activity_label">My Posts</string>
+    <string name="post_job_activity_label">Create Job Post</string>
+    <string name="main_activity_label">Job Posts</string>
+    <string name="post_detail_activity_label">Job Post Details</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

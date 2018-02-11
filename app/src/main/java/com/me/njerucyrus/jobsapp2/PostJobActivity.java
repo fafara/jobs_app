@@ -22,7 +22,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.me.njerucyrus.models.JobPost;
 
@@ -111,38 +114,24 @@ public class PostJobActivity extends AppCompatActivity {
 
 
                     progressDialog.show();
+
                     db.collection("jobs").add(jobPost)
+
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
-                                    if (progressDialog.isShowing()) {
-                                        progressDialog.dismiss();
-                                    }
-                                    Toast.makeText(getApplicationContext(), "Job Post submitted",
-                                            Toast.LENGTH_LONG).show();
                                     startActivity(new Intent(PostJobActivity.this, MainActivity.class));
-                                }
-                            })
-                            .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentReference> task) {
-                                    if (progressDialog.isShowing()) {
-                                        progressDialog.dismiss();
-                                    }
-
+                                    Toast.makeText(getApplicationContext(), "Job posted successfully.", Toast.LENGTH_LONG).show();
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    if (progressDialog.isShowing()) {
-                                        progressDialog.dismiss();
-                                    }
 
-                                    Toast.makeText(getApplicationContext(), "ERROR OCCURED " + e.getLocalizedMessage(),
-                                            Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(), "Error occurred while posting.", Toast.LENGTH_LONG).show();
                                 }
                             });
+
                 }
             }
         });
