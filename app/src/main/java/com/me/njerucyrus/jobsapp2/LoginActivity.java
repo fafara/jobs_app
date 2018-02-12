@@ -51,6 +51,7 @@ public class LoginActivity extends AppCompatActivity {
         txtPassword = (EditText) findViewById(R.id.txtAuthPassword);
         progressDialog = new ProgressDialog(LoginActivity.this);
         progressDialog.setMessage("Authenticating...");
+        progressDialog.setCancelable(false);
         btnAuthCreateAccount = (Button) findViewById(R.id.btnAuthCreateAccount);
 
         mAuth = FirebaseAuth.getInstance();

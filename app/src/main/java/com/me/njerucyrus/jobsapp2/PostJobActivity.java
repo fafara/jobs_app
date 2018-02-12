@@ -1,6 +1,8 @@
 package com.me.njerucyrus.jobsapp2;
 
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,8 +12,11 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
@@ -29,17 +34,23 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.me.njerucyrus.models.JobPost;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class PostJobActivity extends AppCompatActivity {
     Button btnSubmitJobPost;
-    EditText txtTitle, txtDescription, txtSalary, txtDeadline, txtLocation;
+    EditText txtTitle, txtDescription,txtLocation;
+    TextView txtDeadline;
     String category;
     FirebaseFirestore db;
     FirebaseAuth mAuth;
     ProgressDialog progressDialog;
     private JobPost jobPost;
     Spinner spinner;
+    private SimpleDateFormat mSimpleDateFormat;
+    private Calendar mCalendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +87,11 @@ public class PostJobActivity extends AppCompatActivity {
         txtDescription = (EditText) findViewById(R.id.txtDescription);
 
         txtLocation = (EditText) findViewById(R.id.txtLocation);
-        txtDeadline = (EditText) findViewById(R.id.txtDeadline);
+        txtDeadline = (TextView) findViewById(R.id.txtDeadline);
+
+        mSimpleDateFormat = new SimpleDateFormat("MM/dd/yyyy h:mm a", Locale.getDefault());
+
+        txtDeadline.setOnClickListener(textListener);
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Submitting please wait...");
@@ -87,6 +102,7 @@ public class PostJobActivity extends AppCompatActivity {
                 .setPersistenceEnabled(true)
                 .build();
         db.setFirestoreSettings(settings);
+
 
         btnSubmitJobPost = (Button) findViewById(R.id.btnSubmitJobPost);
         btnSubmitJobPost.setOnClickListener(new View.OnClickListener() {
@@ -166,8 +182,8 @@ public class PostJobActivity extends AppCompatActivity {
             txtLocation.setError(null);
         }
 
-        if (txtDeadline.getText().toString().trim().isEmpty()) {
-            txtDeadline.setError("This field is required");
+        if (txtDeadline.getText().toString().trim().equals(getResources().getString(R.string.post_job_deadline_hint))) {
+            Toast.makeText(PostJobActivity.this,"Please select a deadline", Toast.LENGTH_SHORT).show();
             valid = false;
         } else {
             txtDeadline.setError(null);
@@ -184,4 +200,38 @@ public class PostJobActivity extends AppCompatActivity {
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
         }
     }
+
+    /* Define the onClickListener, and start the DatePickerDialog with users current time */
+    private final View.OnClickListener textListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            mCalendar = Calendar.getInstance();
+            new DatePickerDialog(PostJobActivity.this, mDateDataSet, mCalendar.get(Calendar.YEAR),
+                    mCalendar.get(Calendar.MONTH), mCalendar.get(Calendar.DAY_OF_MONTH)).show();
+        }
+    };
+
+    /* After user decided on a date, store those in our calendar variable and then start the TimePickerDialog immediately */
+    private final DatePickerDialog.OnDateSetListener mDateDataSet = new DatePickerDialog.OnDateSetListener() {
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+            mCalendar.set(Calendar.YEAR, year);
+            mCalendar.set(Calendar.MONTH, monthOfYear);
+            mCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            new TimePickerDialog(PostJobActivity.this, mTimeDataSet, mCalendar.get(Calendar.HOUR_OF_DAY), mCalendar.get(Calendar.MINUTE), false).show();
+        }
+    };
+
+    /* After user decided on a time, save them into our calendar instance, and now parse what our calendar has into the TextView */
+    private final TimePickerDialog.OnTimeSetListener mTimeDataSet = new TimePickerDialog.OnTimeSetListener() {
+        @Override
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            mCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            mCalendar.set(Calendar.MINUTE, minute);
+            txtDeadline.setText(mSimpleDateFormat.format(mCalendar.getTime()));
+        }
+    };
+    
+    
+    
 }

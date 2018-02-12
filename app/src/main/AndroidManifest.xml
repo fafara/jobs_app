@@ -15,46 +15,44 @@
             android:name=".MainActivity"
             android:label="@string/main_activity_label"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".LoginActivity"
-            android:label="@string/login_activity_label"
-            >
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/login_activity_label">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterActivity"
-            android:label="@string/register_activity_label"
-            >
-
+        <activity
+            android:name=".RegisterActivity"
+            android:label="@string/register_activity_label">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.me.njerucyrus.jobsapp2.LoginActivity" />
         </activity>
-        <activity android:name=".PostJobActivity"
-            android:label="@string/post_job_activity_label"
-            >
-
+        <activity
+            android:name=".PostJobActivity"
+            android:label="@string/post_job_activity_label">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.me.njerucyrus.jobsapp2.MainActivity" />
         </activity>
-        <activity android:name=".JobPostDetailActivity"
-            android:label="@string/post_detail_activity_label"
-            >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.me.njerucyrus.jobsapp2.MainActivity" />
-
-        </activity>
-        <activity android:name=".MyPostsActivity"
-            android:label="@string/myposts_activity_label"
-            >
+        <activity
+            android:name=".JobPostDetailActivity"
+            android:label="@string/post_detail_activity_label">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.me.njerucyrus.jobsapp2.MainActivity" />
         </activity>
+        <activity
+            android:name=".MyPostsActivity"
+            android:label="@string/myposts_activity_label">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.me.njerucyrus.jobsapp2.MainActivity" />
+        </activity>
+        <activity android:name=".ChatActivity"></activity>
     </application>
 
 </manifest>

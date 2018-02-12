@@ -22,7 +22,7 @@
     <string name="post_job_title_hint">Title</string>
     <string name="post_job_desc_hint">Description</string>
     <string name="post_job_price_hint">Salary</string>
-    <string name="post_job_deadline_hint">Deadline eg 24hrs</string>
+    <string name="post_job_deadline_hint">Select Deadline</string>
     <string name="post_job_location_hint">Location</string>
     <string name="post_job_button_next">Submit</string>
     <string name="post_job_image_logo">Logged in user pic</string>
