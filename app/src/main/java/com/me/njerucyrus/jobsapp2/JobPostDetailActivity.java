@@ -1,12 +1,14 @@
 package com.me.njerucyrus.jobsapp2;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 public class JobPostDetailActivity extends AppCompatActivity {
-    TextView mTitle, mDescription, mLocation, mDeadline,mPostedBy, mCategory;
+    TextView mTitle, mDescription, mLocation, mDeadline,mPostedBy, mCategory, mStartChat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,5 +36,14 @@ public class JobPostDetailActivity extends AppCompatActivity {
         mCategory.setText(category);
         String postedBy = "Posted By: "+getIntent().getStringExtra("postedBy");
         mPostedBy.setText(postedBy);
+
+        mStartChat = (TextView)findViewById(R.id.txtStartChat);
+        mStartChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(JobPostDetailActivity.this, ChatActivity.class));
+                finish();
+            }
+        });
     }
 }

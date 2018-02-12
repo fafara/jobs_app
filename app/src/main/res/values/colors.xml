@@ -8,4 +8,6 @@
     <color name="colorPrimaryRed">#F44336</color>
     <color name="colorBlack">#000000</color>
     <color name="colorLightGrey">#EEEEEE</color>
+    <color name="colorLightDeepGrey">#a7a4a4</color>
+
 </resources>

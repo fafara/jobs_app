@@ -4,6 +4,110 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorLightGrey"
     tools:context="com.me.njerucyrus.jobsapp2.ChatActivity">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorLightGrey"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorLightGrey">
+
+            <TextView
+                android:id="@+id/msgSent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="30dp"
+                android:text="12 Feb 2018" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/msgSent"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_toRightOf="@id/picture_chat_person"
+                android:autoSizeTextType="uniform"
+                android:background="@color/colorPrimary"
+                android:padding="15dp"
+                android:text="hello there how are you doing?"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/colorWhite" />
+
+            <ImageView
+                android:id="@+id/picture_chat_person"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/msgSent"
+                android:layout_marginStart="17dp"
+                android:layout_marginTop="15dp"
+                android:src="@drawable/ic_person_black_48dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorLightGrey">
+
+            <TextView
+                android:id="@+id/msgReply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@color/colorLightDeepGrey"
+                android:padding="15dp"
+                android:text="Am doing great!."
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/colorBlack" />
+
+            <TextView
+                android:id="@+id/sendStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/msgReply"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="1dp"
+                android:padding="15dp"
+                android:text="Seen"
+                android:textAppearance="?android:textAppearanceSmall" />
+            <EditText
+                android:id="@+id/txtMessage"
+                android:layout_width="260dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_alignParentBottom="true"
+                android:hint="Type your message..."
+                android:inputType="textMultiLine"
+                android:padding="15dp"
+
+                />
+
+            <Button
+                android:id="@+id/btnSendMsg"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/txtMessage"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/ic_send_black_24dp"
+                android:padding="15dp" />
+        </RelativeLayout>
+
+
+
+    </LinearLayout>
+
 
 </android.support.constraint.ConstraintLayout>

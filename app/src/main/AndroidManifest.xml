@@ -52,7 +52,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.me.njerucyrus.jobsapp2.MainActivity" />
         </activity>
-        <activity android:name=".ChatActivity"></activity>
+        <activity android:name=".ChatActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.me.njerucyrus.jobsapp2.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

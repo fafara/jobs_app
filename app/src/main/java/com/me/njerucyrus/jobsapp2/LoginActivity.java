@@ -75,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                finish();
             }
         });
 
@@ -97,6 +98,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                         if (user != null) {
                                             startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                            finish();
                                         }
 
                                     } else {
@@ -145,6 +147,7 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            finish();
         }
     }
 
@@ -164,7 +167,9 @@ public class LoginActivity extends AppCompatActivity {
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
-                // ...
+                Toast.makeText(LoginActivity.this, "Authentication failed.",
+                        Toast.LENGTH_LONG).show();
+
             }
         }
     }

@@ -81,6 +81,7 @@ public class RegisterActivity extends AppCompatActivity {
                                                             }
                                                             Toast.makeText(RegisterActivity.this, "Account Created Successfully", Toast.LENGTH_LONG).show();
                                                             startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+                                                            finish();
                                                         } else {
                                                             if (progressDialog.isShowing()) {
                                                                 progressDialog.dismiss();

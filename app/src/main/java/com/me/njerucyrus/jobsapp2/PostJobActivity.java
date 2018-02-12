@@ -138,6 +138,7 @@ public class PostJobActivity extends AppCompatActivity {
                                 public void onSuccess(DocumentReference documentReference) {
                                     startActivity(new Intent(PostJobActivity.this, MainActivity.class));
                                     Toast.makeText(getApplicationContext(), "Job posted successfully.", Toast.LENGTH_LONG).show();
+                                    finish();
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {
@@ -198,6 +199,7 @@ public class PostJobActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+            finish();
         }
     }
 

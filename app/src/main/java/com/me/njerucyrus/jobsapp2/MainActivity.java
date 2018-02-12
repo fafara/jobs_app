@@ -179,12 +179,14 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_post_job) {
             startActivity(new Intent(MainActivity.this, PostJobActivity.class));
-
+            finish();
         } else if (id == R.id.nav_all_job_posts) {
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            finish();
 
         } else if (id == R.id.nav_my_posts) {
             startActivity(new Intent(MainActivity.this, MyPostsActivity.class));
+            finish();
         } else if (id == R.id.nav_invite_friend) {
             Toast.makeText(getApplicationContext(), "Comming soon", Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_profile) {
@@ -203,6 +205,7 @@ public class MainActivity extends AppCompatActivity
                         FirebaseAuth.getInstance().signOut();
                         signOut();
                         startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                        finish();
                     } else {
                         //LOGIN
 
