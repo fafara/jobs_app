@@ -16,6 +16,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.me.njerucyrus.models.User;
@@ -57,7 +59,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (validate()) {
-                    String fullName = txtFullName.getText().toString();
+                    final String fullName = txtFullName.getText().toString();
                     String email = txtEmail.getText().toString();
                     String phoneNumber = txtPhoneNumber.getText().toString();
                     String password = txtConfirmPassword.getText().toString();
@@ -71,6 +73,13 @@ public class RegisterActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
+                                        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+                                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                                .setDisplayName(fullName).build();
+
+                                        currentUser.updateProfile(profileUpdates);
+
                                         db.collection("users").add(user)
                                                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                                                     @Override
@@ -80,8 +89,9 @@ public class RegisterActivity extends AppCompatActivity {
                                                                 progressDialog.dismiss();
                                                             }
                                                             Toast.makeText(RegisterActivity.this, "Account Created Successfully", Toast.LENGTH_LONG).show();
-                                                            startActivity(new Intent(RegisterActivity.this, MainActivity.class));
                                                             finish();
+                                                            startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+
                                                         } else {
                                                             if (progressDialog.isShowing()) {
                                                                 progressDialog.dismiss();

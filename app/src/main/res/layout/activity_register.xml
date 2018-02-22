@@ -23,7 +23,7 @@
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:drawablePadding="5dp"
-                android:background="@xml/round_edit_text"
+                android:background="@drawable/round_edit_text"
                 >
 
                 <EditText
@@ -48,7 +48,7 @@
                 android:layout_marginRight="5dp"
                 android:drawablePadding="5dp"
 
-                android:background="@xml/round_edit_text"
+                android:background="@drawable/round_edit_text"
                 >
 
                 <EditText
@@ -72,7 +72,7 @@
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:drawablePadding="5dp"
-                android:background="@xml/round_edit_text"
+                android:background="@drawable/round_edit_text"
                 >
 
                 <EditText
@@ -97,7 +97,7 @@
                     android:layout_marginRight="5dp"
                     android:drawablePadding="5dp"
 
-                    android:background="@xml/round_edit_text"
+                    android:background="@drawable/round_edit_text"
                     >
 
                     <EditText
@@ -122,7 +122,7 @@
                 android:layout_marginRight="5dp"
                 android:drawablePadding="5dp"
 
-                android:background="@xml/round_edit_text"
+                android:background="@drawable/round_edit_text"
                 >
 
                 <EditText
@@ -144,7 +144,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/auth_button_register_text"
-                android:background="@xml/round_button"
+                android:background="@drawable/round_button"
                 android:textColor="@color/colorWhite"
 
                 android:layout_marginStart="15dp"

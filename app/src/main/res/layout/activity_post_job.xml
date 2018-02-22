@@ -24,7 +24,7 @@
             android:layout_marginRight="5dp"
             android:paddingStart="15dp"
             android:paddingEnd="15dp"
-            android:background="@xml/round_edit_text"
+            android:background="@drawable/round_edit_text"
             >
 
         </Spinner>
@@ -37,7 +37,7 @@
             android:layout_marginRight="5dp"
             android:drawablePadding="5dp"
 
-            android:background="@xml/round_edit_text"
+            android:background="@drawable/round_edit_text"
             >
 
             <EditText
@@ -62,7 +62,7 @@
             android:layout_marginRight="5dp"
             android:drawablePadding="5dp"
 
-            android:background="@xml/round_edit_text"
+            android:background="@drawable/round_edit_text"
             >
 
             <EditText
@@ -87,7 +87,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:drawablePadding="5dp"
-            android:background="@xml/round_edit_text"
+            android:background="@drawable/round_edit_text"
             >
 
             <EditText
@@ -111,7 +111,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:drawablePadding="5dp"
-            android:background="@xml/round_edit_text"
+            android:background="@drawable/round_edit_text"
             >
 
             <TextView
@@ -133,7 +133,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/colorWhite"
-            android:background="@xml/round_button"
+            android:background="@drawable/round_button"
             android:text="@string/post_job_button_next"
             android:layout_marginTop="15dp"
             android:layout_marginStart="15dp"

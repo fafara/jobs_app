@@ -15,6 +15,7 @@
     <string name="auth_password_hint">Enter Your Password</string>
     <string name="auth_button_login_text">Login</string>
     <string name="auth_button_register_text">Register</string>
+    <string name="auth_button_fb_login">Login with facebook</string>
     <string name="register_fullname_hint">Enter Your full name</string>
     <string name="register_phonenumber_hint">Enter Your Phone Number</string>
     <string name="register_email_hint">Enter Your Email Address</string>
@@ -23,10 +24,15 @@
     <string name="post_job_desc_hint">Description</string>
     <string name="post_job_price_hint">Salary</string>
     <string name="post_job_deadline_hint">Select Deadline</string>
-    <string name="post_job_location_hint">Location</string>
+    <string name="post_job_location_hint">Type Your Location...</string>
     <string name="post_job_button_next">Submit</string>
     <string name="post_job_image_logo">Logged in user pic</string>
     <string name="vertical_ellipsis">&#8942;</string>
+
+    <string name="facebook_app_id">296967707496471</string>
+    <string name="fb_login_protocol_scheme">fb296967707496471</string>
+    <string name="nav_header_email">jobsapp@njerucyrus.com</string>
+
 
     <string-array name="caterory_array">
         <item>Select Category</item>

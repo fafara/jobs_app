@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -19,18 +20,12 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.me.njerucyrus.models.JobPost;
 
@@ -58,13 +53,14 @@ public class PostJobActivity extends AppCompatActivity {
         setContentView(R.layout.activity_post_job);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
 
         spinner = (Spinner) findViewById(R.id.category_spinner);
-// Create an ArrayAdapter using the string array and a default spinner layout
+// Create an ArrayAdapter using the string array and a default spinner auto_complete_place_item
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.caterory_array, android.R.layout.simple_spinner_item);
-// Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
 // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
 
@@ -83,6 +79,10 @@ public class PostJobActivity extends AppCompatActivity {
 
             }
         });
+
+
+
+
         txtTitle = (EditText) findViewById(R.id.txtTitle);
         txtDescription = (EditText) findViewById(R.id.txtDescription);
 
@@ -114,7 +114,7 @@ public class PostJobActivity extends AppCompatActivity {
                     double lng = 0.00;
                     Date postedOn = new Date();
                     FirebaseUser currentUser = mAuth.getCurrentUser();
-                    String user = currentUser.getEmail();
+                    String user = currentUser.getDisplayName();
 
                     jobPost = new JobPost(
                             category,

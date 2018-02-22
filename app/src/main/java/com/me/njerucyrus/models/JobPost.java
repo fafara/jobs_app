@@ -1,7 +1,5 @@
 package com.me.njerucyrus.models;
 
-import com.google.firebase.auth.FirebaseUser;
-
 import java.util.Date;
 
 /**
@@ -19,8 +17,7 @@ public class JobPost {
     private String postedBy;
     private String deadline;
 
-    public JobPost() {
-    }
+    public JobPost() {}
 
     public JobPost(String category, String description, String title, String location, double lat, double lng, Date postedOn, String postedBy, String deadline) {
         this.category = category;
