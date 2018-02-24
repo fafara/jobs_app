@@ -62,7 +62,6 @@ public class ChatActivity extends AppCompatActivity {
     private DatabaseReference mUsersRef;
     private DatabaseReference mRootRef;
     private FirebaseUser mCurrentUser;
-    private ActionBar ab;
     private TextView mTitle;
     private TextView mLastSeen;
     private CircleImageView mCircleImageView;
@@ -94,17 +93,21 @@ public class ChatActivity extends AppCompatActivity {
     private Runnable input_finish_checker;
     private Handler handler;
 
+    private ActionBar ab;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        ActionBar ab = getSupportActionBar();
+        ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setDisplayShowCustomEnabled(true);
         ab.setTitle(getIntent().getStringExtra("fullName"));
-        mChatUserId = getIntent().getStringExtra("user_uid");
+
+
+        mChatUserId = getIntent().getStringExtra("postedByUid");
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -136,35 +139,16 @@ public class ChatActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot != null) {
                     String online = dataSnapshot.child("online").getValue().toString();
-                    final String thumbnailUrl = dataSnapshot.child("imageThumbnail").getValue().toString();
-                    Picasso.with(ChatActivity.this)
-                            .load(thumbnailUrl)
-                            .networkPolicy(NetworkPolicy.OFFLINE)
-                            .placeholder(R.mipmap.default_avator)
-                            .into(mCircleImageView, new Callback() {
-                                @Override
-                                public void onSuccess() {
-                                    //do nothing since file retrieved locally
-                                }
-
-                                @Override
-                                public void onError() {
-                                    //fetch file from the online db
-                                    Picasso.with(ChatActivity.this)
-                                            .load(thumbnailUrl)
-                                            .placeholder(R.mipmap.default_avator)
-                                            .into(mCircleImageView);
-                                }
-                            });
                     if (online.equals("true")) {
-                        mLastSeen.setText(getResources().getString(R.string.online));
+//
+                        ab.setSubtitle(getResources().getString(R.string.online));
 
-                    } else {
+                    } else if(!online.equals("false") && !online.equals("true")) {
 
                         long timeAgo = Long.parseLong(dataSnapshot.child("online").getValue().toString());
                         GetTimeAgo ago = new GetTimeAgo();
                         String lastSeen = ago.getTimeAgo(timeAgo, getApplicationContext());
-                        mLastSeen.setText(lastSeen);
+                        ab.setSubtitle(lastSeen);
 
 
                     }
@@ -297,9 +281,9 @@ public class ChatActivity extends AppCompatActivity {
                         if (dataSnapshot.hasChild("typing")) {
                             String typing = dataSnapshot.child("typing").getValue().toString();
                             if (typing.equals("true")) {
-                                mLastSeen.setText(getResources().getString(R.string.typing));
+//                                mLastSeen.setText(getResources().getString(R.string.typing));
                             } else {
-                                mLastSeen.setText("online");
+                                //mLastSeen.setText("online");
                                 //show status last seen.
                             }
                         }
@@ -371,6 +355,18 @@ public class ChatActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (mCurrentUser == null) {
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        }else{
+            mRootRef.child("Users").child(mCurrentUser.getUid()).child("online").setValue("true");
+        }
+
     }
 
     @Override
@@ -587,6 +583,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
+
 
 
 }

@@ -3,7 +3,10 @@ package com.me.njerucyrus.jobsapp2;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
@@ -20,10 +23,15 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
@@ -35,15 +43,16 @@ import java.util.Date;
 import java.util.Locale;
 
 public class PostJobActivity extends AppCompatActivity {
-    Button btnSubmitJobPost;
-    EditText txtTitle, txtDescription,txtLocation;
-    TextView txtDeadline;
-    String category;
-    FirebaseFirestore db;
-    FirebaseAuth mAuth;
-    ProgressDialog progressDialog;
+    private Button btnSubmitJobPost;
+    private EditText txtTitle, txtDescription, txtLocation;
+    private TextView txtDeadline;
+    private String category;
+    private DatabaseReference mJobsRef;
+    private FirebaseAuth mAuth;
+    private FirebaseUser mCurrentUser;
+    private ProgressDialog progressDialog;
     private JobPost jobPost;
-    Spinner spinner;
+    private Spinner spinner;
     private SimpleDateFormat mSimpleDateFormat;
     private Calendar mCalendar;
 
@@ -57,7 +66,7 @@ public class PostJobActivity extends AppCompatActivity {
 
 
         spinner = (Spinner) findViewById(R.id.category_spinner);
-// Create an ArrayAdapter using the string array and a default spinner auto_complete_place_item
+        // Create an ArrayAdapter using the string array and a default spinner auto_complete_place_item
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.caterory_array, android.R.layout.simple_spinner_item);
 
@@ -81,8 +90,6 @@ public class PostJobActivity extends AppCompatActivity {
         });
 
 
-
-
         txtTitle = (EditText) findViewById(R.id.txtTitle);
         txtDescription = (EditText) findViewById(R.id.txtDescription);
 
@@ -95,14 +102,11 @@ public class PostJobActivity extends AppCompatActivity {
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Submitting please wait...");
+        mAuth = FirebaseAuth.getInstance();
+        mCurrentUser = mAuth.getCurrentUser();
 
 
-        db = FirebaseFirestore.getInstance();
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(true)
-                .build();
-        db.setFirestoreSettings(settings);
-
+        mJobsRef = FirebaseDatabase.getInstance().getReference().child("Jobs");
 
         btnSubmitJobPost = (Button) findViewById(R.id.btnSubmitJobPost);
         btnSubmitJobPost.setOnClickListener(new View.OnClickListener() {
@@ -110,11 +114,13 @@ public class PostJobActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (validate()) {
 
+
+
+
                     double lat = 0.00;
                     double lng = 0.00;
                     Date postedOn = new Date();
-                    FirebaseUser currentUser = mAuth.getCurrentUser();
-                    String user = currentUser.getDisplayName();
+
 
                     jobPost = new JobPost(
                             category,
@@ -124,34 +130,58 @@ public class PostJobActivity extends AppCompatActivity {
                             lat,
                             lng,
                             postedOn,
-                            user,
+                            mCurrentUser.getEmail(),
+                            mCurrentUser.getUid(),
                             txtDeadline.getText().toString()
                     );
 
 
                     progressDialog.show();
 
-                    db.collection("jobs").add(jobPost)
+                    if (!isNetworkAvailable()) {
+                        mJobsRef.push().setValue(jobPost);
+                        progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(), "Job posted successfully", Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(PostJobActivity.this, MainActivity.class));
+                    }else{
+                        postWithNet();
+                    }
 
-                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                @Override
-                                public void onSuccess(DocumentReference documentReference) {
-                                    startActivity(new Intent(PostJobActivity.this, MainActivity.class));
-                                    Toast.makeText(getApplicationContext(), "Job posted successfully.", Toast.LENGTH_LONG).show();
-                                    finish();
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
 
-                                    Toast.makeText(getApplicationContext(), "Error occurred while posting.", Toast.LENGTH_LONG).show();
-                                }
-                            });
+                } else {
+                    progressDialog.dismiss();
+
+                    Toast.makeText(getApplicationContext(), "fix errors above", Toast.LENGTH_LONG).show();
 
                 }
             }
         });
+    }
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private void postWithNet() {
+        mJobsRef.push().setValue(jobPost)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        progressDialog.dismiss();
+                        // Exception e = jobTask.getException();
+                        Toast.makeText(getApplicationContext(), "Job posted successfully", Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(PostJobActivity.this, MainActivity.class));
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(), "Error occurred while posting job", Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
     public boolean validate() {
@@ -184,7 +214,7 @@ public class PostJobActivity extends AppCompatActivity {
         }
 
         if (txtDeadline.getText().toString().trim().equals(getResources().getString(R.string.post_job_deadline_hint))) {
-            Toast.makeText(PostJobActivity.this,"Please select a deadline", Toast.LENGTH_SHORT).show();
+            Toast.makeText(PostJobActivity.this, "Please select a deadline", Toast.LENGTH_SHORT).show();
             valid = false;
         } else {
             txtDeadline.setError(null);
@@ -200,6 +230,12 @@ public class PostJobActivity extends AppCompatActivity {
         if (currentUser == null) {
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             finish();
+        }else{
+            DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
+            mRootRef.child("Users")
+                    .child(mAuth.getCurrentUser().getUid())
+                    .child("online")
+                    .setValue("true");
         }
     }
 
@@ -233,7 +269,6 @@ public class PostJobActivity extends AppCompatActivity {
             txtDeadline.setText(mSimpleDateFormat.format(mCalendar.getTime()));
         }
     };
-    
-    
-    
+
+
 }

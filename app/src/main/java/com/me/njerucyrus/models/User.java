@@ -1,5 +1,7 @@
 package com.me.njerucyrus.models;
 
+import com.google.firebase.database.Exclude;
+
 /**
  * Created by njerucyrus on 2/6/18.
  */
@@ -17,6 +19,18 @@ public class User {
 
 
     public User() {
+    }
+
+    public User(String fullName, String email, String phoneNumber, String userUid, String status, String image, String imageThumbnail, String deviceTokenId, String online) {
+        this.fullName = fullName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.userUid = userUid;
+        this.status = status;
+        this.image = image;
+        this.imageThumbnail = imageThumbnail;
+        this.deviceTokenId = deviceTokenId;
+        this.online = online;
     }
 
     public String getFullName() {

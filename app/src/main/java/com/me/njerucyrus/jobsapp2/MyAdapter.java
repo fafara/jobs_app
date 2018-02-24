@@ -1,6 +1,5 @@
 package com.me.njerucyrus.jobsapp2;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -9,12 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.android.volley.RequestQueue;
 import com.github.curioustechizen.ago.RelativeTimeTextView;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.me.njerucyrus.models.JobPost;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,12 +20,12 @@ import java.util.List;
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private List<JobPost> listItems;
     private Context mContext;
-    private FirebaseFirestore db;
 
-    public MyAdapter(List<JobPost> listItems, Context mContext, FirebaseFirestore db) {
+
+    public MyAdapter(List<JobPost> listItems, Context mContext) {
         this.listItems = listItems;
         this.mContext = mContext;
-        this.db = db;
+
     }
 
     @Override
@@ -40,13 +36,15 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        final JobPost itemList = listItems.get(position);
+        JobPost itemList = listItems.get(position);
 
         String desc = itemList.getDescription()+"\nCategory: "+itemList.getCategory()+"\nDeadline "+itemList.getDeadline()+
                 "\nposted by "+itemList.getPostedBy();
         holder.txtTitle.setText(itemList.getTitle()+" @"+itemList.getLocation());
         holder.txtItemDescription.setText(desc);
         holder.timePosted.setReferenceTime(itemList.getPostedOn().getTime());
+
+
 
 
 
@@ -58,7 +56,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         return listItems.size();
     }
 
-    public  class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView txtTitle;
         public TextView txtItemDescription;
         public TextView txtOptionDigit;
@@ -66,9 +64,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
 
 
-
+        View mView;
         public ViewHolder(final View itemView) {
             super(itemView);
+
 
             itemView.setOnClickListener(this);
 
@@ -92,6 +91,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             intent.putExtra("location", post.getLocation());
             intent.putExtra("postedOn", post.getPostedOn());
             intent.putExtra("postedBy", post.getPostedBy());
+            intent.putExtra("postedByUid", post.getPostedByUid());
             intent.putExtra("deadline", post.getDeadline());
             mContext.startActivity(intent);
         }

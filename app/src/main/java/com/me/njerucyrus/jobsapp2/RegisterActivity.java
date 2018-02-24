@@ -18,8 +18,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.me.njerucyrus.models.User;
 
 import java.util.HashMap;
@@ -30,8 +33,7 @@ public class RegisterActivity extends AppCompatActivity {
             txtConfirmPassword;
 
     private Button btnRegister;
-
-    FirebaseFirestore db;
+    DatabaseReference mUsersRef;
     private FirebaseAuth mAuth;
     private User user;
 
@@ -49,7 +51,7 @@ public class RegisterActivity extends AppCompatActivity {
         txtPhoneNumber = (EditText) findViewById(R.id.txtPhoneNumber);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
         txtConfirmPassword = (EditText) findViewById(R.id.txtConfirmPassword);
-        db = FirebaseFirestore.getInstance();
+        mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
         mAuth = FirebaseAuth.getInstance();
         progressDialog = new ProgressDialog(RegisterActivity.this);
 
@@ -59,60 +61,51 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (validate()) {
-                    final String fullName = txtFullName.getText().toString();
-                    String email = txtEmail.getText().toString();
-                    String phoneNumber = txtPhoneNumber.getText().toString();
-                    String password = txtConfirmPassword.getText().toString();
-                    user = new User(fullName, email,phoneNumber);
 
 
                     progressDialog.setMessage("Creating account ...");
                     progressDialog.show();
-                    mAuth.createUserWithEmailAndPassword(email, password)
+                    mAuth.createUserWithEmailAndPassword(txtEmail.getText().toString().trim(), txtConfirmPassword.getText().toString().trim())
                             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                                    if (task.isSuccessful()){
 
-                                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                                .setDisplayName(fullName).build();
+                                        String fullName = txtFullName.getText().toString();
+                                        String email = txtEmail.getText().toString();
+                                        String phoneNumber = txtPhoneNumber.getText().toString();
+                                        String imageThumbnail = "default";
+                                        String userUid = mAuth.getCurrentUser().getUid();
+                                        String status = "default";
+                                        String image = "default";
+                                        String deviceTokenId = FirebaseInstanceId.getInstance().getToken();
+                                        String online = "false";
 
-                                        currentUser.updateProfile(profileUpdates);
+                                        user = new User(fullName, email,  phoneNumber, userUid, status, image, imageThumbnail, deviceTokenId, online);
+                                        mUsersRef.child(userUid).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> userTask) {
+                                                if (userTask.isSuccessful()){
+                                                    progressDialog.dismiss();
+                                                    Toast.makeText(getApplicationContext(), "User account created successfully", Toast.LENGTH_LONG).show();
+                                                    startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+                                                }else{
+                                                    progressDialog.dismiss();
+                                                    Toast.makeText(getApplicationContext(), "Error occurred while creating user account please try again", Toast.LENGTH_LONG).show();
 
-                                        db.collection("users").add(user)
-                                                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                                                        if (task.isSuccessful()) {
-                                                            if (progressDialog.isShowing()) {
-                                                                progressDialog.dismiss();
-                                                            }
-                                                            Toast.makeText(RegisterActivity.this, "Account Created Successfully", Toast.LENGTH_LONG).show();
-                                                            finish();
-                                                            startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+                                                }
+                                            }
+                                        });
 
-                                                        } else {
-                                                            if (progressDialog.isShowing()) {
-                                                                progressDialog.dismiss();
-                                                            }
-                                                            Toast.makeText(RegisterActivity.this, "Failed to setup your account please try again later",
-                                                                    Toast.LENGTH_LONG).show();
-                                                        }
-                                                    }
-                                                });
+                                    }else{
+                                        progressDialog.dismiss();
+                                        Toast.makeText(getApplicationContext(), "Error occurred while creating user account please try again", Toast.LENGTH_LONG).show();
 
-                                    } else {
-                                        if (progressDialog.isShowing()) {
-                                            progressDialog.dismiss();
-                                        }
-                                        Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                        Toast.makeText(getApplicationContext(), "Failed to create account.",
-                                                Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
                 } else {
+
                     Toast.makeText(getApplicationContext(), "Please fix the errors above",
                             Toast.LENGTH_SHORT).show();
                 }

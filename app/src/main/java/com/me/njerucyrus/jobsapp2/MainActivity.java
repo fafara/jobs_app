@@ -2,25 +2,22 @@ package com.me.njerucyrus.jobsapp2;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,22 +27,21 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.me.njerucyrus.models.CustomJobPostComparator;
 import com.me.njerucyrus.models.JobPost;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -53,12 +49,20 @@ public class MainActivity extends AppCompatActivity
 
     private RecyclerView recyclerView;
     private MyAdapter adapter;
-    private List<JobPost> jobPosts;
+    private List<JobPost> jobPosts = new ArrayList<>();
     private ProgressDialog progressDialog;
-    private FirebaseFirestore db;
-    private ListenerRegistration firestoreListener;
+    private DatabaseReference mJobsRef;
     private FirebaseAuth mAuth;
+    private FirebaseUser mCurrentUser;
+    private DatabaseReference mUsersRef;
     private GoogleSignInClient mGoogleSignInClient;
+    private SwipeRefreshLayout mSwipeLayout;
+    private LinearLayoutManager mLayoutManager;
+    private final static int ITEMS_PER_PAGE = 10;
+    private int CURRENT_PAGE = 1;
+    private int itemPos = 0;
+    private String mLastKey = "";
+    private String mPrevKey  = "";
 
     final String TAG = "MainActivityTag";
 
@@ -77,6 +81,10 @@ public class MainActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
+        mSwipeLayout = (SwipeRefreshLayout)findViewById(R.id.jobs_swipe_layout);
+        mAuth = FirebaseAuth.getInstance();
+        mCurrentUser = mAuth.getCurrentUser();
+        mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUser.getUid());
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -95,47 +103,103 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        Collections.sort(jobPosts, Collections.<JobPost>reverseOrder());
+
+        adapter = new MyAdapter(jobPosts, MainActivity.this);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        mLayoutManager.setReverseLayout(true);
+        mLayoutManager.setStackFromEnd(true);
+
+        recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         mAuth = FirebaseAuth.getInstance();
-
-        jobPosts = new ArrayList<>();
+        mJobsRef = FirebaseDatabase.getInstance().getReference().child("Jobs");
+        mJobsRef.keepSynced(true);
 
         progressDialog = new ProgressDialog(this);
+        recyclerView.setAdapter(adapter);
 
-        progressDialog.setMessage("Loading...");
-        progressDialog.show();
-        db = FirebaseFirestore.getInstance();
+       progressDialog.setMessage("Loading...");
+       progressDialog.show();
+
         loadJobPosts();
 
-        firestoreListener = db.collection("jobs")
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                        if (e != null) {
+        mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                CURRENT_PAGE++;
+                itemPos = 0;
 
-                            Log.e(TAG, "Listen failed!", e);
-                            return;
-                        }
-                        if (progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                        }
-                        List<JobPost> updatedList = new ArrayList<>();
-                        for (DocumentSnapshot doc : documentSnapshots) {
+                loadMorePosts();
+                adapter.notifyDataSetChanged();
 
-                            JobPost post = doc.toObject(JobPost.class);
-                            updatedList.add(post);
-                        }
-                        jobPosts.clear();
-                        adapter = new MyAdapter(updatedList, MainActivity.this, db);
-                        recyclerView.setAdapter(adapter);
+            }
 
-                    }
-                });
+        });
 
+
+    }
+
+    private void loadMorePosts() {
+
+        Query jobsQuery = mJobsRef.orderByKey().endAt(mLastKey).limitToLast(ITEMS_PER_PAGE);
+        jobsQuery.keepSynced(true);
+        jobsQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
+                JobPost jobPost = dataSnapshot.getValue(JobPost.class);
+                String jobPostKey = dataSnapshot.getKey();
+
+                if(!mPrevKey.equals(jobPostKey)){
+
+                    jobPosts.add(itemPos++, jobPost);
+
+
+                } else {
+
+                    mPrevKey = mLastKey;
+
+                }
+
+
+                if(itemPos == 1) {
+
+                    mLastKey = jobPostKey;
+
+                }
+
+                adapter.notifyDataSetChanged();
+
+                mSwipeLayout.setRefreshing(false);
+
+                mLayoutManager.scrollToPositionWithOffset(10, 0);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//                jobPosts.remove(dataSnapshot.getValue(JobPost.class));
+//                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 
@@ -187,7 +251,13 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_my_posts) {
             startActivity(new Intent(MainActivity.this, MyPostsActivity.class));
             finish();
-        } else if (id == R.id.nav_invite_friend) {
+        }
+        else if (id == R.id.nav_messages){
+            startActivity(new Intent(MainActivity.this, MessagesActivity.class));
+            finish();
+        }
+
+        else if (id == R.id.nav_invite_friend) {
             Toast.makeText(getApplicationContext(), "Comming soon", Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_profile) {
             Toast.makeText(getApplicationContext(), "Comming soon", Toast.LENGTH_LONG).show();
@@ -232,48 +302,84 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        firestoreListener.remove();
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
+
+        if (mCurrentUser == null) {
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+        }else{
+
+            mUsersRef.child("online").setValue("true");
         }
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        long timestamp = System.currentTimeMillis();
+        String serverTime = ""+timestamp;
+        mUsersRef.child("online").setValue(serverTime);
+
     }
 
     private void loadJobPosts() {
-        db.collection("jobs").orderBy("postedOn", Query.Direction.DESCENDING)
-                .limit(50)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                        }
+       //do logic here
+        Query jobsQuery = mJobsRef.orderByKey().limitToLast(CURRENT_PAGE * ITEMS_PER_PAGE);
+        jobsQuery.keepSynced(true);
+        jobsQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                        if (task.isSuccessful()) {
+                    JobPost jobPost = dataSnapshot.getValue(JobPost.class);
 
-                            for (DocumentSnapshot document : task.getResult()) {
-                                JobPost jobPost = document.toObject(JobPost.class);
-                                jobPosts.add(jobPost);
-                            }
 
-                            adapter = new MyAdapter(jobPosts, MainActivity.this, db);
-                            recyclerView.setAdapter(adapter);
+                itemPos++;
 
-                        } else {
-                            if (progressDialog.isShowing()) {
-                                progressDialog.dismiss();
-                            }
-                            Toast.makeText(MainActivity.this, "No data found", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
+                if(itemPos == 1){
+
+                    String jobPostKey = dataSnapshot.getKey();
+
+                    mLastKey = jobPostKey;
+                    mPrevKey = jobPostKey;
+
+                }
+
+                jobPosts.add(jobPost);
+
+                
+                adapter.notifyDataSetChanged();
+                progressDialog.dismiss();
+
+                mSwipeLayout.setRefreshing(false);
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//                jobPosts.remove(dataSnapshot.getValue(JobPost.class));
+//                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void signOut() {

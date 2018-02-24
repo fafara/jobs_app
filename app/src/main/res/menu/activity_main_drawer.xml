@@ -10,20 +10,25 @@
             android:title="Post Job" />
         <item
             android:id="@+id/nav_all_job_posts"
-            android:icon="@drawable/ic_remove_red_eye_black_48dp"
+            android:icon="@drawable/ic_work_black_24dp"
             android:title="All Job Posts" />
         <item
             android:id="@+id/nav_my_posts"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_work_black_24dp"
             android:title="My Posts" />
     </group>
 
     <item android:title="Communicate">
         <menu>
             <item
+                android:id="@+id/nav_messages"
+                android:icon="@drawable/ic_message_black_48dp"
+                android:title="Messages" />
+            <item
                 android:id="@+id/nav_invite_friend"
                 android:icon="@drawable/ic_menu_share"
                 android:title="Invite Friend" />
+
         </menu>
     </item>
 

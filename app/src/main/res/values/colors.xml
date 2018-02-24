@@ -6,9 +6,9 @@
     <color name="colorPrimaryDark">#1B5E20</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorPrimaryRed">#F44336</color>
-    <color name="colorBlack">#000000</color>
     <color name="colorLightGrey">#EEEEEE</color>
     <color name="colorLightDeepGrey">#a7a4a4</color>
     <color name="colorFb">#3B5998</color>
+    <color name="colorBlack">#000000</color>
 
 </resources>

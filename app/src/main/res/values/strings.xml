@@ -32,6 +32,9 @@
     <string name="facebook_app_id">296967707496471</string>
     <string name="fb_login_protocol_scheme">fb296967707496471</string>
     <string name="nav_header_email">jobsapp@njerucyrus.com</string>
+    <string name="typing">typing ...</string>
+    <string name="online">online</string>
+    <string name="label_chats">Chats</string>
 
 
     <string-array name="caterory_array">

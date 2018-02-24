@@ -15,11 +15,13 @@ public class JobPost {
     private double lng;
     private Date postedOn;
     private String postedBy;
+    private String postedByUid;
     private String deadline;
+
 
     public JobPost() {}
 
-    public JobPost(String category, String description, String title, String location, double lat, double lng, Date postedOn, String postedBy, String deadline) {
+    public JobPost(String category, String description, String title, String location, double lat, double lng, Date postedOn, String postedBy, String postedByUid, String deadline) {
         this.category = category;
         this.description = description;
         this.title = title;
@@ -28,6 +30,7 @@ public class JobPost {
         this.lng = lng;
         this.postedOn = postedOn;
         this.postedBy = postedBy;
+        this.postedByUid = postedByUid;
         this.deadline = deadline;
     }
 
@@ -93,6 +96,14 @@ public class JobPost {
 
     public void setPostedBy(String postedBy) {
         this.postedBy = postedBy;
+    }
+
+    public String getPostedByUid() {
+        return postedByUid;
+    }
+
+    public void setPostedByUid(String postedByUid) {
+        this.postedByUid = postedByUid;
     }
 
     public String getDeadline() {
