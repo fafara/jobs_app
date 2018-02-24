@@ -258,6 +258,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         else if (id == R.id.nav_invite_friend) {
+            startActivity(new Intent(MainActivity.this, WelcomeScreenActivity.class));
             Toast.makeText(getApplicationContext(), "Comming soon", Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_profile) {
             Toast.makeText(getApplicationContext(), "Comming soon", Toast.LENGTH_LONG).show();

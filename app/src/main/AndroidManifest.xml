@@ -84,13 +84,14 @@
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
-        <activity android:name=".MessagesActivity"
-            android:label="@string/label_chats"
-            >
+        <activity
+            android:name=".MessagesActivity"
+            android:label="@string/label_chats">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.me.njerucyrus.jobsapp2.MainActivity" />
         </activity>
+        <activity android:name=".WelcomeScreenActivity"></activity>
     </application>
 
 </manifest>

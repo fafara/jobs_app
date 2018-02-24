@@ -35,6 +35,8 @@
     <string name="typing">typing ...</string>
     <string name="online">online</string>
     <string name="label_chats">Chats</string>
+    <string name="enter_your_phone_number_to_continue">Enter your phone number to continue</string>
+    <string name="btn_submit">SUBMIT</string>
 
 
     <string-array name="caterory_array">

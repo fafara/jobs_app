@@ -31,6 +31,7 @@ dependencies {
 // FirebaseUI for Cloud Storage
     implementation 'com.firebaseui:firebase-ui-storage:3.2.1'
 
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
@@ -43,7 +44,6 @@ dependencies {
     compile 'com.google.firebase:firebase-firestore:11.8.0'
     compile 'com.github.curioustechizen.android-ago:library:1.3.4'
     compile 'com.facebook.android:facebook-login:4.30.0'
-
     compile 'com.google.firebase:firebase-storage:11.8.0'
     compile 'com.google.firebase:firebase-database:11.8.0'
     compile 'com.google.firebase:firebase-messaging:11.8.0'
@@ -52,5 +52,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'id.zelory:compressor:2.1.0'
     compile 'com.squareup.okhttp:okhttp:2.7.2'
+    //phone number field
+    compile 'com.hbb20:ccp:2.1.4'
 }
 apply plugin: 'com.google.gms.google-services'
