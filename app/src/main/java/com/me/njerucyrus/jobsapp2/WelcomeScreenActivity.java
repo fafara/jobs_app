@@ -1,5 +1,6 @@
 package com.me.njerucyrus.jobsapp2;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -34,6 +35,7 @@ public class WelcomeScreenActivity extends AppCompatActivity {
     private String mVerificationId;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     private FirebaseAuth mAuth;
+    private ProgressDialog mProgressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,29 +46,40 @@ public class WelcomeScreenActivity extends AppCompatActivity {
         mBtnSubmit = (Button)findViewById(R.id.btn_submit_phone);
         //other
         txtEnterCode = (TextView)findViewById(R.id.txt_enter_code);
+        txtEnterphone = (TextView) findViewById(R.id.textview_enter_phone);
+
         txtVerificationCode = (EditText)findViewById(R.id.verification_code);
         mBtnVerify = (Button)findViewById(R.id.btn_verify);
         appIcon1 = (ImageView)findViewById(R.id.logo1);
         appIcon2 = (ImageView)findViewById(R.id.logo2);
 
+        mProgressDialog = new ProgressDialog(WelcomeScreenActivity.this);
+        mProgressDialog.setTitle("Submitting");
+        mProgressDialog.setTitle("Please wait ...");
+        mProgressDialog.setCanceledOnTouchOutside(false);
+
         mBtnSubmit.setEnabled(false);
         mBtnSubmit.setVisibility(View.INVISIBLE);
         mAuth = FirebaseAuth.getInstance();
+
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks(){
 
             @Override
             public void onVerificationCompleted(PhoneAuthCredential credential) {
+                mProgressDialog.dismiss();
                 signInWithPhoneAuthCredential(credential);
             }
 
             @Override
             public void onVerificationFailed(FirebaseException e) {
-
+                    mProgressDialog.dismiss();
             }
 
             @Override
-            public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
-                super.onCodeSent(s, forceResendingToken);
+            public void onCodeSent(String verificationId, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
+                super.onCodeSent(verificationId, forceResendingToken);
+                mProgressDialog.dismiss();
+                mVerificationId = verificationId;
                 txtEnterphone.setVisibility(View.GONE);
                 ccp.setVisibility(View.GONE);
                 editTextCarrierNumber.setVisibility(View.GONE);
@@ -78,6 +91,11 @@ public class WelcomeScreenActivity extends AppCompatActivity {
                 txtVerificationCode.setVisibility(View.VISIBLE);
                 mBtnVerify.setVisibility(View.VISIBLE);
 
+            }
+
+            @Override
+            public void onCodeAutoRetrievalTimeOut(String verificationId) {
+                super.onCodeAutoRetrievalTimeOut(verificationId);
             }
         };
 
@@ -96,6 +114,7 @@ public class WelcomeScreenActivity extends AppCompatActivity {
                     mBtnSubmit.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+                            mProgressDialog.show();
                             PhoneAuthProvider.getInstance().verifyPhoneNumber(
                                     ccp.getFullNumberWithPlus(),
                                     60,
@@ -111,6 +130,15 @@ public class WelcomeScreenActivity extends AppCompatActivity {
                     mBtnSubmit.setEnabled(false);
                     mBtnSubmit.setVisibility(View.INVISIBLE);
                 }
+            }
+        });
+
+        mBtnVerify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String code = txtVerificationCode.getText().toString().trim();
+                PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, code);
+                signInWithPhoneAuthCredential(credential);
             }
         });
 

@@ -9,6 +9,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+
     }
     buildTypes {
         release {
@@ -54,5 +56,7 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.7.2'
     //phone number field
     compile 'com.hbb20:ccp:2.1.4'
+    compile 'com.android.support:multidex:1.0.1'
+
 }
 apply plugin: 'com.google.gms.google-services'

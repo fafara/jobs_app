@@ -1,6 +1,9 @@
 package com.me.njerucyrus.jobsapp2;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -14,7 +17,7 @@ import com.google.firebase.database.ValueEventListener;
  * Created by njerucyrus on 2/23/18.
  */
 
-public class JobApp extends Application {
+public class JobApp extends MultiDexApplication {
 
     private FirebaseAuth mAuth;
     private DatabaseReference mUsersRef;
@@ -48,6 +51,12 @@ public class JobApp extends Application {
                 }
             });
         }
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 
 }
