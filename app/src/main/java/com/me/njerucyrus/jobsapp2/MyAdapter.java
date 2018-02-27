@@ -2,14 +2,23 @@ package com.me.njerucyrus.jobsapp2;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.provider.ContactsContract;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.curioustechizen.ago.RelativeTimeTextView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.me.njerucyrus.models.JobPost;
+import com.me.njerucyrus.models.User;
 
 import java.util.List;
 
@@ -35,7 +44,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         JobPost itemList = listItems.get(position);
 
         String desc = itemList.getDescription()+"\nCategory: "+itemList.getCategory()+"\nDeadline "+itemList.getDeadline()+
@@ -61,8 +70,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         public TextView txtItemDescription;
         public TextView txtOptionDigit;
         public RelativeTimeTextView timePosted;
-
-
 
         View mView;
         public ViewHolder(final View itemView) {

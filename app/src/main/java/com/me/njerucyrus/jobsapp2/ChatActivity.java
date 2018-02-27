@@ -526,10 +526,18 @@ public class ChatActivity extends AppCompatActivity {
             messageMap.put("to", mChatUserId);
             messageMap.put("time", ServerValue.TIMESTAMP);
 
+            DatabaseReference newNotificationRef = mRootRef.child("Notifications").push();
+            String notificationId = newNotificationRef.getKey();
+
+            HashMap<String, String> notificationData = new HashMap<>();
+            notificationData.put("from", mCurrentUser.getUid());
+            notificationData.put("type", "message_sent");
+
             //Create another map to add data to each users chat thread
             Map chatUserMessageMap = new HashMap();
             chatUserMessageMap.put(current_user_ref + "/" + message_push_id, messageMap);
             chatUserMessageMap.put(chat_user_ref + "/" + message_push_id, messageMap);
+            chatUserMessageMap.put("Notifications/" + mChatUserId + "/" + notificationId, notificationData);
             mEditTextMessage.setText("");
 
             mRootRef.updateChildren(chatUserMessageMap, new DatabaseReference.CompletionListener() {

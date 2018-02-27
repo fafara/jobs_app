@@ -58,5 +58,8 @@ dependencies {
     compile 'com.hbb20:ccp:2.1.4'
     compile 'com.android.support:multidex:1.0.1'
 
+    //code input
+    compile 'com.github.glomadrian:CodeInput:1.1@aar'
+
 }
 apply plugin: 'com.google.gms.google-services'

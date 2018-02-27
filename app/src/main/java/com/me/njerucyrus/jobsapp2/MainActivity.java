@@ -1,14 +1,18 @@
 package com.me.njerucyrus.jobsapp2;
 
+import android.*;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -18,6 +22,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -62,7 +67,7 @@ public class MainActivity extends AppCompatActivity
     private int CURRENT_PAGE = 1;
     private int itemPos = 0;
     private String mLastKey = "";
-    private String mPrevKey  = "";
+    private String mPrevKey = "";
 
     final String TAG = "MainActivityTag";
 
@@ -81,7 +86,7 @@ public class MainActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
-        mSwipeLayout = (SwipeRefreshLayout)findViewById(R.id.jobs_swipe_layout);
+        mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.jobs_swipe_layout);
         mAuth = FirebaseAuth.getInstance();
         mCurrentUser = mAuth.getCurrentUser();
         mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mCurrentUser.getUid());
@@ -122,8 +127,8 @@ public class MainActivity extends AppCompatActivity
         progressDialog = new ProgressDialog(this);
         recyclerView.setAdapter(adapter);
 
-       progressDialog.setMessage("Loading...");
-       progressDialog.show();
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
 
         loadJobPosts();
 
@@ -154,7 +159,7 @@ public class MainActivity extends AppCompatActivity
                 JobPost jobPost = dataSnapshot.getValue(JobPost.class);
                 String jobPostKey = dataSnapshot.getKey();
 
-                if(!mPrevKey.equals(jobPostKey)){
+                if (!mPrevKey.equals(jobPostKey)) {
 
                     jobPosts.add(itemPos++, jobPost);
 
@@ -166,7 +171,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
 
-                if(itemPos == 1) {
+                if (itemPos == 1) {
 
                     mLastKey = jobPostKey;
 
@@ -251,14 +256,10 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_my_posts) {
             startActivity(new Intent(MainActivity.this, MyPostsActivity.class));
             finish();
-        }
-        else if (id == R.id.nav_messages){
+        } else if (id == R.id.nav_messages) {
             startActivity(new Intent(MainActivity.this, MessagesActivity.class));
             finish();
-        }
-
-        else if (id == R.id.nav_invite_friend) {
-            startActivity(new Intent(MainActivity.this, WelcomeScreenActivity.class));
+        } else if (id == R.id.nav_invite_friend) {
             Toast.makeText(getApplicationContext(), "Comming soon", Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_profile) {
             Toast.makeText(getApplicationContext(), "Comming soon", Toast.LENGTH_LONG).show();
@@ -309,10 +310,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-
-        if (mCurrentUser == null) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-        }else{
+        } else {
 
             mUsersRef.child("online").setValue("true");
         }
@@ -323,25 +324,25 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         long timestamp = System.currentTimeMillis();
-        String serverTime = ""+timestamp;
+        String serverTime = "" + timestamp;
         mUsersRef.child("online").setValue(serverTime);
 
     }
 
     private void loadJobPosts() {
-       //do logic here
+        //do logic here
         Query jobsQuery = mJobsRef.orderByKey().limitToLast(CURRENT_PAGE * ITEMS_PER_PAGE);
         jobsQuery.keepSynced(true);
         jobsQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                    JobPost jobPost = dataSnapshot.getValue(JobPost.class);
+                JobPost jobPost = dataSnapshot.getValue(JobPost.class);
 
 
                 itemPos++;
 
-                if(itemPos == 1){
+                if (itemPos == 1) {
 
                     String jobPostKey = dataSnapshot.getKey();
 
@@ -352,7 +353,7 @@ public class MainActivity extends AppCompatActivity
 
                 jobPosts.add(jobPost);
 
-                
+
                 adapter.notifyDataSetChanged();
                 progressDialog.dismiss();
 

@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -30,12 +31,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.me.njerucyrus.models.JobPost;
+import com.me.njerucyrus.models.User;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -48,6 +53,8 @@ public class PostJobActivity extends AppCompatActivity {
     private TextView txtDeadline;
     private String category;
     private DatabaseReference mJobsRef;
+    private DatabaseReference mUsersRef;
+    private DatabaseReference mProfilesRef;
     private FirebaseAuth mAuth;
     private FirebaseUser mCurrentUser;
     private ProgressDialog progressDialog;
@@ -107,6 +114,9 @@ public class PostJobActivity extends AppCompatActivity {
 
 
         mJobsRef = FirebaseDatabase.getInstance().getReference().child("Jobs");
+        mUsersRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        mProfilesRef = FirebaseDatabase.getInstance().getReference().child("Profiles");
+
 
         btnSubmitJobPost = (Button) findViewById(R.id.btnSubmitJobPost);
         btnSubmitJobPost.setOnClickListener(new View.OnClickListener() {
@@ -114,13 +124,15 @@ public class PostJobActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (validate()) {
 
-
-
-
                     double lat = 0.00;
                     double lng = 0.00;
                     Date postedOn = new Date();
 
+                    SharedPreferences settings = getSharedPreferences("PROFILE_DATA",
+                            Context.MODE_PRIVATE);
+                    String fullName = settings.getString("fullName", "");
+                    String phoneNumber = settings.getString("phoneNumber", "");
+                    String postedBy = fullName + " || " + phoneNumber;
 
                     jobPost = new JobPost(
                             category,
@@ -130,7 +142,7 @@ public class PostJobActivity extends AppCompatActivity {
                             lat,
                             lng,
                             postedOn,
-                            mCurrentUser.getEmail(),
+                            postedBy,
                             mCurrentUser.getUid(),
                             txtDeadline.getText().toString()
                     );
@@ -143,8 +155,8 @@ public class PostJobActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                         Toast.makeText(getApplicationContext(), "Job posted successfully", Toast.LENGTH_LONG).show();
                         startActivity(new Intent(PostJobActivity.this, MainActivity.class));
-                    }else{
-                        postWithNet();
+                    } else {
+                        postWithNet(jobPost);
                     }
 
 
@@ -157,6 +169,7 @@ public class PostJobActivity extends AppCompatActivity {
             }
         });
     }
+
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -164,7 +177,7 @@ public class PostJobActivity extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    private void postWithNet() {
+    private void postWithNet(JobPost jobPost) {
         mJobsRef.push().setValue(jobPost)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -230,7 +243,7 @@ public class PostJobActivity extends AppCompatActivity {
         if (currentUser == null) {
             startActivity(new Intent(getApplicationContext(), LoginActivity.class));
             finish();
-        }else{
+        } else {
             DatabaseReference mRootRef = FirebaseDatabase.getInstance().getReference();
             mRootRef.child("Users")
                     .child(mAuth.getCurrentUser().getUid())

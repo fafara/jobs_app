@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Jobs App</string>
     <string name="login_activity_label">Login</string>
-    <string name="register_activity_label">Register</string>
+    <string name="register_activity_label">Set Up Account Profile</string>
     <string name="myposts_activity_label">My Posts</string>
     <string name="post_job_activity_label">Create Job Post</string>
     <string name="main_activity_label">Job Posts</string>
@@ -14,11 +14,11 @@
     <string name="auth_username_hint">Enter Your Email</string>
     <string name="auth_password_hint">Enter Your Password</string>
     <string name="auth_button_login_text">Login</string>
-    <string name="auth_button_register_text">Register</string>
+    <string name="auth_button_register_text">Finish</string>
     <string name="auth_button_fb_login">Login with facebook</string>
     <string name="register_fullname_hint">Enter Your full name</string>
     <string name="register_phonenumber_hint">Enter Your Phone Number</string>
-    <string name="register_email_hint">Enter Your Email Address</string>
+    <string name="register_email_hint">Enter Your Email Address (Optional)</string>
     <string name="register_confirm_pass_hint">Confirm password</string>
     <string name="post_job_title_hint">Title</string>
     <string name="post_job_desc_hint">Description</string>
@@ -37,6 +37,10 @@
     <string name="label_chats">Chats</string>
     <string name="enter_your_phone_number_to_continue">Enter your phone number to continue</string>
     <string name="btn_submit">SUBMIT</string>
+    <string name="resend_code">RESEND CODE</string>
+    <string name="btn_verify">Verify</string>
+    <string name="login_with_phone_number">Login With Phone Number</string>
+    <string name="setup_acc_profile">Set up Account profile to continue</string>
 
 
     <string-array name="caterory_array">
