@@ -57,13 +57,13 @@ public class JobPostDetailActivity extends AppCompatActivity {
         postedByUid = getIntent().getStringExtra("postedByUid");
         mStartChat = (TextView) findViewById(R.id.txtStartChat);
         if (mCurrentUser.getUid().equals(postedByUid)) {
-            //mStartChat.setEnabled(false);
-            //mStartChat.setVisibility(View.INVISIBLE);
+            mStartChat.setEnabled(false);
+            mStartChat.setVisibility(View.INVISIBLE);
             postedBy = "Posted By Me";
             mPostedBy.setText(postedBy);
         } else {
-           // mStartChat.setEnabled(true);
-            //mStartChat.setVisibility(View.VISIBLE);
+            mStartChat.setEnabled(true);
+            mStartChat.setVisibility(View.VISIBLE);
             mPostedBy.setText(postedBy);
         }
 

@@ -82,8 +82,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                startActivity(new Intent(MainActivity.this, MessagesActivity.class));
             }
         });
         mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.jobs_swipe_layout);

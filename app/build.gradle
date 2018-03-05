@@ -32,6 +32,7 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-firestore:3.2.1'
 // FirebaseUI for Cloud Storage
     implementation 'com.firebaseui:firebase-ui-storage:3.2.1'
+    implementation 'com.android.support:multidex:1.0.3'
 
 
     testImplementation 'junit:junit:4.12'
@@ -50,13 +51,14 @@ dependencies {
     compile 'com.google.firebase:firebase-database:11.8.0'
     compile 'com.google.firebase:firebase-messaging:11.8.0'
     compile 'de.hdodenhof:circleimageview:2.2.0'
-    compile 'com.theartofdev.edmodo:android-image-cropper:2.6.+'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.android.support:multidex:1.0.3'
+    compile 'com.theartofdev.edmodo:android-image-cropper:2.5.1'
     compile 'id.zelory:compressor:2.1.0'
     compile 'com.squareup.okhttp:okhttp:2.7.2'
     //phone number field
     compile 'com.hbb20:ccp:2.1.4'
-    compile 'com.android.support:multidex:1.0.1'
+
 
     //code input
     compile 'com.github.glomadrian:CodeInput:1.1@aar'

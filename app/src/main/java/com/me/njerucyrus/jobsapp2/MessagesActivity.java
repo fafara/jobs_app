@@ -52,7 +52,7 @@ public class MessagesActivity extends AppCompatActivity {
 
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
-        ab.setTitle(getIntent().getStringExtra("Chats"));
+
 
         mConvList = (RecyclerView) findViewById(R.id.conv_list);
         mAuth = FirebaseAuth.getInstance();
